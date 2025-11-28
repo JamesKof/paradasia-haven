@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
+import { VideoShortsSlider } from "@/components/VideoShortsSlider";
 import { AboutSection } from "@/components/AboutSection";
 import { AccommodationSection } from "@/components/AccommodationSection";
 import { AmenitiesSection } from "@/components/AmenitiesSection";
@@ -12,6 +13,7 @@ const Index = () => {
     <main className="min-h-screen overflow-x-hidden">
       <Navbar />
       <HeroSection />
+      <VideoShortsSlider />
       <AboutSection />
       <AccommodationSection />
       <AmenitiesSection />
