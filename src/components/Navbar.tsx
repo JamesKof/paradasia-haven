@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -15,6 +17,8 @@ const navLinks = [
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +27,11 @@ export const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav
@@ -54,13 +63,43 @@ export const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-brand-sky hover:text-brand-orange">
-              <User className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-            <Button variant="orange" size="default">
-              Book Now
-            </Button>
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-brand-sky hover:text-brand-orange"
+                  onClick={() => navigate("/profile")}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Profile
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-brand-sky hover:text-brand-orange"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-brand-sky hover:text-brand-orange"
+                onClick={() => navigate("/auth")}
+              >
+                <User className="w-4 h-4 mr-2" />
+                Login
+              </Button>
+            )}
+            <a href="#accommodation">
+              <Button variant="orange" size="default">
+                Book Now
+              </Button>
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,13 +129,28 @@ export const Navbar = () => {
               </a>
             ))}
             <div className="flex flex-col gap-3 mt-4 px-4">
-              <Button variant="outline" className="w-full">
-                <User className="w-4 h-4 mr-2" />
-                Profile
-              </Button>
-              <Button variant="orange" className="w-full">
-                Book Now
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="outline" className="w-full" onClick={() => navigate("/profile")}>
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </Button>
+                  <Button variant="ghost" className="w-full" onClick={handleLogout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline" className="w-full" onClick={() => navigate("/auth")}>
+                  <User className="w-4 h-4 mr-2" />
+                  Login
+                </Button>
+              )}
+              <a href="#accommodation" onClick={() => setIsOpen(false)}>
+                <Button variant="orange" className="w-full">
+                  Book Now
+                </Button>
+              </a>
             </div>
           </div>
         </div>

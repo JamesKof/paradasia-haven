@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Crown, Users, Bed, Wifi, Wind, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BookingModal } from "@/components/BookingModal";
 import presidentialSuite from "@/assets/presidential-suite.jpg";
 import standardRoom from "@/assets/standard-room.jpg";
 
@@ -24,7 +26,7 @@ const rooms = [
     guests: "2 Guests",
     icon: Bed,
   },
-];
+] as const;
 
 const commonAmenities = [
   { icon: Wifi, name: "Free Wi-Fi" },
@@ -33,6 +35,27 @@ const commonAmenities = [
 ];
 
 export const AccommodationSection = () => {
+  const [bookingModal, setBookingModal] = useState<{
+    isOpen: boolean;
+    roomType: "presidential" | "standard";
+    roomName: string;
+    price: number;
+  }>({
+    isOpen: false,
+    roomType: "presidential",
+    roomName: "",
+    price: 0,
+  });
+
+  const openBookingModal = (room: typeof rooms[number]) => {
+    setBookingModal({
+      isOpen: true,
+      roomType: room.id,
+      roomName: room.name,
+      price: room.price,
+    });
+  };
+
   return (
     <section id="accommodation" className="section-padding bg-brand-blue-dark">
       <div className="max-w-7xl mx-auto">
@@ -53,7 +76,7 @@ export const AccommodationSection = () => {
 
         {/* Rooms Grid */}
         <div className="grid lg:grid-cols-2 gap-8">
-          {rooms.map((room, index) => (
+          {rooms.map((room) => (
             <div
               key={room.id}
               className="group relative bg-brand-blue-light rounded-2xl overflow-hidden border border-brand-blue hover:border-brand-orange/30 transition-all duration-500 shadow-elevation-4 hover:shadow-elevation-6"
@@ -118,7 +141,7 @@ export const AccommodationSection = () => {
                 </div>
 
                 {/* CTA */}
-                <Button variant="orange" className="w-full">
+                <Button variant="orange" className="w-full" onClick={() => openBookingModal(room)}>
                   Book {room.name}
                 </Button>
               </div>
@@ -126,6 +149,15 @@ export const AccommodationSection = () => {
           ))}
         </div>
       </div>
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={bookingModal.isOpen}
+        onClose={() => setBookingModal((prev) => ({ ...prev, isOpen: false }))}
+        roomType={bookingModal.roomType}
+        roomName={bookingModal.roomName}
+        pricePerNight={bookingModal.price}
+      />
     </section>
   );
 };
