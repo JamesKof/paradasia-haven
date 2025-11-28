@@ -20,17 +20,21 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // Brand colors
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          light: "hsl(var(--gold-light))",
-          dark: "hsl(var(--gold-dark))",
-          muted: "hsl(var(--gold-muted))",
+        // Brand colors from logo
+        "brand-blue": {
+          DEFAULT: "hsl(var(--brand-blue))",
+          light: "hsl(var(--brand-blue-light))",
+          dark: "hsl(var(--brand-blue-dark))",
+          muted: "hsl(var(--brand-blue-muted))",
         },
-        "deep-blue": {
-          DEFAULT: "hsl(var(--deep-blue))",
-          light: "hsl(var(--deep-blue-light))",
-          muted: "hsl(var(--deep-blue-muted))",
+        "brand-orange": {
+          DEFAULT: "hsl(var(--brand-orange))",
+          light: "hsl(var(--brand-orange-light))",
+          dark: "hsl(var(--brand-orange-dark))",
+        },
+        "brand-sky": {
+          DEFAULT: "hsl(var(--brand-sky))",
+          light: "hsl(var(--brand-sky-light))",
         },
         ocean: {
           DEFAULT: "hsl(var(--ocean))",
@@ -93,7 +97,8 @@ export default {
         'elevation-4': 'var(--shadow-4)',
         'elevation-5': 'var(--shadow-5)',
         'elevation-6': 'var(--shadow-6)',
-        'gold-glow': 'var(--glow-gold)',
+        'orange-glow': 'var(--glow-orange)',
+        'blue-glow': 'var(--glow-blue)',
       },
       keyframes: {
         "accordion-down": {
@@ -120,6 +125,10 @@ export default {
           "0%": { backgroundPosition: "-200% center" },
           "100%": { backgroundPosition: "200% center" },
         },
+        scroll: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -128,6 +137,7 @@ export default {
         "scale-in": "scale-in 0.4s ease-out forwards",
         float: "float 3s ease-in-out infinite",
         shimmer: "shimmer 3s linear infinite",
+        scroll: "scroll 30s linear infinite",
       },
       spacing: {
         '18': '4.5rem',

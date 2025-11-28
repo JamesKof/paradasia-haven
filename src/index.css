@@ -6,70 +6,78 @@
 
 @layer base {
   :root {
-    /* Royal Gold - Primary Accent */
-    --gold: 45 77% 52%;
-    --gold-light: 45 80% 65%;
-    --gold-dark: 45 75% 40%;
-    --gold-muted: 45 40% 75%;
+    /* Brand Colors from Logo */
+    /* Deep Blue - Primary (palm tree, waves, main text) */
+    --brand-blue: 217 75% 35%;
+    --brand-blue-light: 217 65% 50%;
+    --brand-blue-dark: 217 80% 25%;
+    --brand-blue-muted: 217 40% 60%;
     
-    /* Deep Blue - Primary */
-    --deep-blue: 220 60% 15%;
-    --deep-blue-light: 220 50% 25%;
-    --deep-blue-muted: 220 30% 35%;
+    /* Sunset Orange - Accent (sun) */
+    --brand-orange: 28 92% 54%;
+    --brand-orange-light: 28 95% 65%;
+    --brand-orange-dark: 28 90% 45%;
     
-    /* Ocean Blues */
-    --ocean: 200 70% 50%;
-    --ocean-light: 200 60% 70%;
-    --ocean-dark: 200 80% 30%;
+    /* Sky Blue - Secondary (HIDEWAY text) */
+    --brand-sky: 200 55% 65%;
+    --brand-sky-light: 200 60% 80%;
+    
+    /* Ocean Teal */
+    --ocean: 195 70% 45%;
+    --ocean-light: 195 60% 70%;
+    --ocean-dark: 195 80% 30%;
     
     /* Base colors */
-    --background: 40 20% 98%;
-    --foreground: 220 60% 10%;
+    --background: 200 20% 98%;
+    --foreground: 217 80% 20%;
     
     --card: 0 0% 100%;
-    --card-foreground: 220 60% 10%;
+    --card-foreground: 217 80% 20%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 220 60% 10%;
+    --popover-foreground: 217 80% 20%;
     
-    --primary: 220 60% 15%;
-    --primary-foreground: 45 77% 52%;
+    --primary: 217 75% 35%;
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 45 77% 52%;
-    --secondary-foreground: 220 60% 10%;
+    --secondary: 28 92% 54%;
+    --secondary-foreground: 217 80% 20%;
     
-    --muted: 40 15% 92%;
-    --muted-foreground: 220 20% 40%;
+    --muted: 200 15% 92%;
+    --muted-foreground: 217 30% 45%;
     
-    --accent: 45 77% 52%;
-    --accent-foreground: 220 60% 10%;
+    --accent: 28 92% 54%;
+    --accent-foreground: 217 80% 20%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
-    --ring: 45 77% 52%;
+    --border: 200 20% 88%;
+    --input: 200 20% 88%;
+    --ring: 28 92% 54%;
     
     --radius: 0.75rem;
     
-    /* Elevation shadows with gold tint */
-    --shadow-1: 0 1px 3px hsl(45 30% 50% / 0.08), 0 1px 2px hsl(220 60% 15% / 0.06);
-    --shadow-2: 0 3px 6px hsl(45 30% 50% / 0.1), 0 2px 4px hsl(220 60% 15% / 0.08);
-    --shadow-3: 0 6px 12px hsl(45 30% 50% / 0.12), 0 4px 8px hsl(220 60% 15% / 0.1);
-    --shadow-4: 0 10px 20px hsl(45 30% 50% / 0.15), 0 6px 10px hsl(220 60% 15% / 0.12);
-    --shadow-5: 0 15px 30px hsl(45 30% 50% / 0.18), 0 10px 15px hsl(220 60% 15% / 0.15);
-    --shadow-6: 0 25px 50px hsl(45 30% 50% / 0.22), 0 15px 25px hsl(220 60% 15% / 0.18);
+    /* Elevation shadows with brand tint */
+    --shadow-1: 0 1px 3px hsl(217 50% 30% / 0.08), 0 1px 2px hsl(217 75% 35% / 0.06);
+    --shadow-2: 0 3px 6px hsl(217 50% 30% / 0.1), 0 2px 4px hsl(217 75% 35% / 0.08);
+    --shadow-3: 0 6px 12px hsl(217 50% 30% / 0.12), 0 4px 8px hsl(217 75% 35% / 0.1);
+    --shadow-4: 0 10px 20px hsl(217 50% 30% / 0.15), 0 6px 10px hsl(217 75% 35% / 0.12);
+    --shadow-5: 0 15px 30px hsl(217 50% 30% / 0.18), 0 10px 15px hsl(217 75% 35% / 0.15);
+    --shadow-6: 0 25px 50px hsl(217 50% 30% / 0.22), 0 15px 25px hsl(217 75% 35% / 0.18);
     
-    /* Gold glow */
-    --glow-gold: 0 0 30px hsl(45 77% 52% / 0.4);
+    /* Orange glow */
+    --glow-orange: 0 0 30px hsl(28 92% 54% / 0.5);
+    --glow-blue: 0 0 30px hsl(217 75% 35% / 0.4);
     
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(45 77% 52%), hsl(45 80% 65%), hsl(45 77% 52%));
-    --gradient-gold-shine: linear-gradient(135deg, hsl(45 80% 65%), hsl(45 77% 52%), hsl(45 75% 40%));
-    --gradient-ocean: linear-gradient(180deg, hsl(200 70% 50%), hsl(220 60% 15%));
-    --gradient-hero: linear-gradient(180deg, hsl(220 60% 10% / 0.3), hsl(220 60% 10% / 0.7));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(40 20% 98%));
+    --gradient-orange: linear-gradient(135deg, hsl(28 90% 45%), hsl(28 92% 54%), hsl(28 95% 65%));
+    --gradient-orange-shine: linear-gradient(135deg, hsl(28 95% 65%), hsl(28 92% 54%), hsl(28 90% 45%));
+    --gradient-blue: linear-gradient(180deg, hsl(217 75% 35%), hsl(217 80% 25%));
+    --gradient-ocean: linear-gradient(180deg, hsl(195 70% 45%), hsl(217 80% 25%));
+    --gradient-hero: linear-gradient(180deg, hsl(217 80% 15% / 0.4), hsl(217 80% 10% / 0.8));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(200 20% 98%));
+    --gradient-sunset: linear-gradient(135deg, hsl(28 92% 54%), hsl(35 100% 60%), hsl(45 100% 70%));
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -82,33 +90,33 @@
   }
 
   .dark {
-    --background: 220 60% 8%;
-    --foreground: 40 20% 95%;
+    --background: 217 80% 8%;
+    --foreground: 200 20% 95%;
     
-    --card: 220 50% 12%;
-    --card-foreground: 40 20% 95%;
+    --card: 217 70% 12%;
+    --card-foreground: 200 20% 95%;
     
-    --popover: 220 50% 12%;
-    --popover-foreground: 40 20% 95%;
+    --popover: 217 70% 12%;
+    --popover-foreground: 200 20% 95%;
     
-    --primary: 45 77% 52%;
-    --primary-foreground: 220 60% 10%;
+    --primary: 28 92% 54%;
+    --primary-foreground: 217 80% 15%;
     
-    --secondary: 220 40% 20%;
-    --secondary-foreground: 40 20% 95%;
+    --secondary: 217 50% 20%;
+    --secondary-foreground: 200 20% 95%;
     
-    --muted: 220 40% 15%;
-    --muted-foreground: 40 15% 65%;
+    --muted: 217 40% 15%;
+    --muted-foreground: 200 20% 65%;
     
-    --accent: 45 77% 52%;
-    --accent-foreground: 220 60% 10%;
+    --accent: 28 92% 54%;
+    --accent-foreground: 217 80% 15%;
     
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 220 40% 20%;
-    --input: 220 40% 20%;
-    --ring: 45 77% 52%;
+    --border: 217 40% 20%;
+    --input: 217 40% 20%;
+    --ring: 28 92% 54%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -137,19 +145,20 @@
 }
 
 @layer components {
-  /* Gold gradient button */
-  .btn-gold {
-    @apply relative overflow-hidden px-8 py-4 font-semibold text-deep-blue rounded-lg transition-all duration-300;
-    background: var(--gradient-gold);
+  /* Orange gradient button */
+  .btn-orange {
+    @apply relative overflow-hidden px-8 py-4 font-semibold rounded-lg transition-all duration-300;
+    background: var(--gradient-orange);
+    color: hsl(var(--brand-blue-dark));
     box-shadow: var(--shadow-3);
   }
 
-  .btn-gold:hover {
-    box-shadow: var(--shadow-5), var(--glow-gold);
+  .btn-orange:hover {
+    box-shadow: var(--shadow-5), var(--glow-orange);
     transform: translateY(-2px);
   }
 
-  .btn-gold:active {
+  .btn-orange:active {
     transform: translateY(0);
     box-shadow: var(--shadow-2);
   }
@@ -173,14 +182,17 @@
     transform: translateY(-8px);
   }
 
-  /* Gold accent border */
-  .gold-border {
-    @apply border-2 border-gold;
+  /* Orange text gradient */
+  .text-orange-gradient {
+    background: var(--gradient-orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  /* Gold text gradient */
-  .text-gold-gradient {
-    background: var(--gradient-gold);
+  /* Blue text gradient */
+  .text-blue-gradient {
+    background: var(--gradient-blue);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -191,9 +203,9 @@
     @apply py-24 px-4 md:px-8 lg:px-16;
   }
 
-  /* Gold focus ring */
-  .gold-focus:focus {
-    @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-background;
+  /* Orange focus ring */
+  .orange-focus:focus {
+    @apply outline-none ring-2 ring-brand-orange ring-offset-2 ring-offset-background;
   }
 
   /* Smooth scroll */
@@ -206,17 +218,18 @@
     background: var(--gradient-hero);
   }
 
-  /* Gold underline animation */
-  .gold-underline {
+  /* Orange underline animation */
+  .orange-underline {
     @apply relative;
   }
 
-  .gold-underline::after {
+  .orange-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background: hsl(var(--brand-orange));
   }
 
-  .gold-underline:hover::after {
+  .orange-underline:hover::after {
     @apply w-full;
   }
 }
@@ -255,6 +268,17 @@
     }
   }
 
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
@@ -270,6 +294,10 @@
 
   .animate-scale-in {
     animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.6s ease-out forwards;
   }
 
   .animation-delay-100 { animation-delay: 100ms; }
