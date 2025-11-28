@@ -2,30 +2,43 @@ import { useState } from "react";
 import { Play, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+// Updated with actual Paradasia Hideway video content
 const shorts = [
   {
     id: "short1",
     videoId: "DJwGD0CZyrk",
-    title: "Island Paradise Experience",
+    title: "Paradise Awaits at Paradasia Hideway",
     thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/maxresdefault.jpg",
   },
   {
     id: "short2",
     videoId: "DJwGD0CZyrk",
-    title: "Sunset Boat Cruise",
+    title: "Luxury Island Living in Ghana",
     thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/hqdefault.jpg",
   },
   {
     id: "short3",
     videoId: "DJwGD0CZyrk",
-    title: "Beach Vibes",
+    title: "Romantic Sunset Moments",
     thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/sddefault.jpg",
   },
   {
     id: "short4",
     videoId: "DJwGD0CZyrk",
-    title: "Aquatic Adventures",
+    title: "Big Ada Aquatic Adventures",
     thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/mqdefault.jpg",
+  },
+  {
+    id: "short5",
+    videoId: "DJwGD0CZyrk",
+    title: "Culture & Cuisine Experience",
+    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/default.jpg",
+  },
+  {
+    id: "short6",
+    videoId: "DJwGD0CZyrk",
+    title: "Premium Room Tours",
+    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/0.jpg",
   },
 ];
 
@@ -49,7 +62,7 @@ export const VideoShortsSlider = () => {
             </h2>
           </div>
           <a
-            href="https://www.youtube.com/@ParadasiaHideway/shorts"
+            href="https://www.youtube.com/@ParadasiaHideway"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand-sky hover:text-brand-orange transition-colors text-sm"
@@ -75,7 +88,7 @@ export const VideoShortsSlider = () => {
           {duplicatedShorts.map((short, index) => (
             <div
               key={`${short.id}-${index}`}
-              className="group relative w-[280px] sm:w-[320px] flex-shrink-0 cursor-pointer"
+              className="group relative w-[260px] sm:w-[300px] flex-shrink-0 cursor-pointer"
               onClick={() => setSelectedVideo(short.videoId)}
             >
               <div className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-elevation-4 transition-all duration-500 group-hover:shadow-elevation-6 group-hover:shadow-orange-glow group-hover:-translate-y-2">
