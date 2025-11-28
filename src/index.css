@@ -2,87 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Royal Gold - Primary Accent */
+    --gold: 45 77% 52%;
+    --gold-light: 45 80% 65%;
+    --gold-dark: 45 75% 40%;
+    --gold-muted: 45 40% 75%;
+    
+    /* Deep Blue - Primary */
+    --deep-blue: 220 60% 15%;
+    --deep-blue-light: 220 50% 25%;
+    --deep-blue-muted: 220 30% 35%;
+    
+    /* Ocean Blues */
+    --ocean: 200 70% 50%;
+    --ocean-light: 200 60% 70%;
+    --ocean-dark: 200 80% 30%;
+    
+    /* Base colors */
+    --background: 40 20% 98%;
+    --foreground: 220 60% 10%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 220 60% 10%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --popover-foreground: 220 60% 10%;
+    
+    --primary: 220 60% 15%;
+    --primary-foreground: 45 77% 52%;
+    
+    --secondary: 45 77% 52%;
+    --secondary-foreground: 220 60% 10%;
+    
+    --muted: 40 15% 92%;
+    --muted-foreground: 220 20% 40%;
+    
+    --accent: 45 77% 52%;
+    --accent-foreground: 220 60% 10%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 40 20% 88%;
+    --input: 40 20% 88%;
+    --ring: 45 77% 52%;
+    
+    --radius: 0.75rem;
+    
+    /* Elevation shadows with gold tint */
+    --shadow-1: 0 1px 3px hsl(45 30% 50% / 0.08), 0 1px 2px hsl(220 60% 15% / 0.06);
+    --shadow-2: 0 3px 6px hsl(45 30% 50% / 0.1), 0 2px 4px hsl(220 60% 15% / 0.08);
+    --shadow-3: 0 6px 12px hsl(45 30% 50% / 0.12), 0 4px 8px hsl(220 60% 15% / 0.1);
+    --shadow-4: 0 10px 20px hsl(45 30% 50% / 0.15), 0 6px 10px hsl(220 60% 15% / 0.12);
+    --shadow-5: 0 15px 30px hsl(45 30% 50% / 0.18), 0 10px 15px hsl(220 60% 15% / 0.15);
+    --shadow-6: 0 25px 50px hsl(45 30% 50% / 0.22), 0 15px 25px hsl(220 60% 15% / 0.18);
+    
+    /* Gold glow */
+    --glow-gold: 0 0 30px hsl(45 77% 52% / 0.4);
+    
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(45 77% 52%), hsl(45 80% 65%), hsl(45 77% 52%));
+    --gradient-gold-shine: linear-gradient(135deg, hsl(45 80% 65%), hsl(45 77% 52%), hsl(45 75% 40%));
+    --gradient-ocean: linear-gradient(180deg, hsl(200 70% 50%), hsl(220 60% 15%));
+    --gradient-hero: linear-gradient(180deg, hsl(220 60% 10% / 0.3), hsl(220 60% 10% / 0.7));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(40 20% 98%));
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 220 60% 8%;
+    --foreground: 40 20% 95%;
+    
+    --card: 220 50% 12%;
+    --card-foreground: 40 20% 95%;
+    
+    --popover: 220 50% 12%;
+    --popover-foreground: 40 20% 95%;
+    
+    --primary: 45 77% 52%;
+    --primary-foreground: 220 60% 10%;
+    
+    --secondary: 220 40% 20%;
+    --secondary-foreground: 40 20% 95%;
+    
+    --muted: 220 40% 15%;
+    --muted-foreground: 40 15% 65%;
+    
+    --accent: 45 77% 52%;
+    --accent-foreground: 220 60% 10%;
+    
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 40% 20%;
+    --input: 220 40% 20%;
+    --ring: 45 77% 52%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -101,5 +128,153 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'DM Sans', sans-serif;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  /* Gold gradient button */
+  .btn-gold {
+    @apply relative overflow-hidden px-8 py-4 font-semibold text-deep-blue rounded-lg transition-all duration-300;
+    background: var(--gradient-gold);
+    box-shadow: var(--shadow-3);
+  }
+
+  .btn-gold:hover {
+    box-shadow: var(--shadow-5), var(--glow-gold);
+    transform: translateY(-2px);
+  }
+
+  .btn-gold:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-2);
+  }
+
+  /* Elevation cards */
+  .elevation-1 { box-shadow: var(--shadow-1); }
+  .elevation-2 { box-shadow: var(--shadow-2); }
+  .elevation-3 { box-shadow: var(--shadow-3); }
+  .elevation-4 { box-shadow: var(--shadow-4); }
+  .elevation-5 { box-shadow: var(--shadow-5); }
+  .elevation-6 { box-shadow: var(--shadow-6); }
+
+  /* Premium card */
+  .premium-card {
+    @apply bg-card rounded-2xl overflow-hidden transition-all duration-500;
+    box-shadow: var(--shadow-3);
+  }
+
+  .premium-card:hover {
+    box-shadow: var(--shadow-5);
+    transform: translateY(-8px);
+  }
+
+  /* Gold accent border */
+  .gold-border {
+    @apply border-2 border-gold;
+  }
+
+  /* Gold text gradient */
+  .text-gold-gradient {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Section styling */
+  .section-padding {
+    @apply py-24 px-4 md:px-8 lg:px-16;
+  }
+
+  /* Gold focus ring */
+  .gold-focus:focus {
+    @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-background;
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Hero overlay */
+  .hero-overlay {
+    background: var(--gradient-hero);
+  }
+
+  /* Gold underline animation */
+  .gold-underline {
+    @apply relative;
+  }
+
+  .gold-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300;
+  }
+
+  .gold-underline:hover::after {
+    @apply w-full;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
 }
