@@ -157,12 +157,28 @@ const Profile = () => {
     if (!selectedBookingId) return;
 
     try {
+      const bookingToCancel = bookings.find(b => b.id === selectedBookingId);
+      
       const { error } = await supabase
         .from("bookings")
         .update({ booking_status: "cancelled" })
         .eq("id", selectedBookingId);
 
       if (error) throw error;
+
+      // Send cancellation email
+      if (bookingToCancel) {
+        try {
+          await supabase.functions.invoke("send-email", {
+            body: {
+              type: "booking_cancellation",
+              booking: { ...bookingToCancel, email: profile?.email || user?.email },
+            },
+          });
+        } catch (emailError) {
+          console.error("Email error:", emailError);
+        }
+      }
 
       setBookings((prev) =>
         prev.map((b) =>
@@ -173,7 +189,7 @@ const Profile = () => {
       setSelectedBookingId(null);
       toast({
         title: "Booking Cancelled",
-        description: "Your booking has been cancelled. Refund will be processed within 5-7 business days.",
+        description: "Your booking has been cancelled. Confirmation email sent. Refund will be processed within 5-7 business days.",
       });
     } catch (error) {
       toast({

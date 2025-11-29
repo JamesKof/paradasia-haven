@@ -1,5 +1,8 @@
-import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { useState } from "react";
+import { MapPin, Phone, Mail, Instagram, Facebook, Twitter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const contactInfo = [
   {
@@ -29,6 +32,86 @@ const socialLinks = [
 ];
 
 export const ContactSection = () => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.firstName || !formData.email || !formData.message) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Save inquiry to database
+      const { error } = await supabase.from("guest_inquiries").insert({
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.email,
+        phone: formData.phone || null,
+        subject: formData.subject || "General Inquiry",
+        message: formData.message,
+      });
+
+      if (error) throw error;
+
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke("send-email", {
+          body: {
+            type: "inquiry_received",
+            inquiry: {
+              name: `${formData.firstName} ${formData.lastName}`.trim(),
+              email: formData.email,
+              subject: formData.subject || "General Inquiry",
+              message: formData.message,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.error("Email error:", emailError);
+      }
+
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for reaching out. We'll get back to you within 24 hours.",
+      });
+
+      // Reset form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error: any) {
+      console.error("Error submitting inquiry:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="section-padding bg-brand-blue-dark">
       <div className="max-w-7xl mx-auto">
@@ -52,20 +135,25 @@ export const ContactSection = () => {
           <div className="bg-brand-blue-light rounded-2xl p-8 border border-brand-blue shadow-elevation-4">
             <h3 className="font-display text-brand-sky-light text-2xl mb-6">Send Us a Message</h3>
             
-            <form className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-brand-sky text-sm mb-2">First Name</label>
+                  <label className="block text-brand-sky text-sm mb-2">First Name *</label>
                   <input
                     type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
                     placeholder="John"
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-brand-sky text-sm mb-2">Last Name</label>
                   <input
                     type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
                     placeholder="Doe"
                   />
@@ -73,11 +161,14 @@ export const ContactSection = () => {
               </div>
               
               <div>
-                <label className="block text-brand-sky text-sm mb-2">Email</label>
+                <label className="block text-brand-sky text-sm mb-2">Email *</label>
                 <input
                   type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
                   placeholder="john@example.com"
+                  required
                 />
               </div>
               
@@ -85,22 +176,51 @@ export const ContactSection = () => {
                 <label className="block text-brand-sky text-sm mb-2">Phone</label>
                 <input
                   type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
                   placeholder="+233 XX XXX XXXX"
                 />
               </div>
-              
+
               <div>
-                <label className="block text-brand-sky text-sm mb-2">Message</label>
-                <textarea
-                  rows={4}
-                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300 resize-none"
-                  placeholder="Tell us about your dream getaway..."
+                <label className="block text-brand-sky text-sm mb-2">Subject</label>
+                <input
+                  type="text"
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
+                  placeholder="Booking inquiry, Special request, etc."
                 />
               </div>
               
-              <Button variant="orange" size="lg" className="w-full">
-                Send Message
+              <div>
+                <label className="block text-brand-sky text-sm mb-2">Message *</label>
+                <textarea
+                  rows={4}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300 resize-none"
+                  placeholder="Tell us about your dream getaway..."
+                  required
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                variant="orange" 
+                size="lg" 
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Message"
+                )}
               </Button>
             </form>
           </div>
