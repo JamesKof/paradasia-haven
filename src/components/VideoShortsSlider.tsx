@@ -50,22 +50,22 @@ export const VideoShortsSlider = () => {
   const [isPaused, setIsPaused] = useState(false);
 
   return (
-    <section id="shorts" className="py-16 bg-brand-blue-dark overflow-hidden">
+    <section id="shorts" className="py-16 overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(28 90% 45%), hsl(28 92% 54%), hsl(35 95% 60%))' }}>
       <div className="max-w-7xl mx-auto px-4 mb-10">
         <div className="flex items-center justify-between">
           <div>
-            <span className="inline-block text-brand-orange text-sm tracking-widest uppercase mb-2">
+            <span className="inline-block text-brand-blue-dark text-sm tracking-widest uppercase mb-2 font-semibold">
               Featured Videos
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl text-brand-sky-light">
-              Experience <span className="text-brand-orange">Paradasia</span>
+            <h2 className="font-display text-2xl sm:text-3xl text-brand-blue-dark">
+              Experience <span className="text-white">Paradasia</span>
             </h2>
           </div>
           <a
             href="https://www.youtube.com/@ParadasiaHideway"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-sky hover:text-brand-orange transition-colors text-sm"
+            className="text-brand-blue-dark hover:text-white transition-colors text-sm font-medium"
           >
             View All →
           </a>
@@ -104,28 +104,28 @@ export const VideoShortsSlider = () => {
                 
                 {/* Play Button */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-brand-orange/90 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-brand-orange shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white shadow-lg">
                     <Play className="w-7 h-7 text-brand-blue-dark ml-1" fill="currentColor" />
                   </div>
                 </div>
                 
                 {/* Title */}
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-brand-sky-light font-medium text-sm line-clamp-2">
+                  <h3 className="text-white font-medium text-sm line-clamp-2">
                     {short.title}
                   </h3>
                 </div>
 
-                {/* Orange Border on Hover */}
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-brand-orange rounded-2xl transition-colors duration-300" />
+                {/* White Border on Hover */}
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-white rounded-2xl transition-colors duration-300" />
               </div>
             </div>
           ))}
         </div>
 
-        {/* Fade Edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-brand-blue-dark to-transparent pointer-events-none z-10" />
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-brand-blue-dark to-transparent pointer-events-none z-10" />
+        {/* Fade Edges - match orange gradient */}
+        <div className="absolute left-0 top-0 bottom-0 w-20 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, hsl(28 90% 45%), transparent)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, hsl(35 95% 60%), transparent)' }} />
       </div>
 
       {/* Video Modal */}

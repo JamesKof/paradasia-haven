@@ -37,8 +37,8 @@ export const Navbar = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-brand-blue-dark/95 backdrop-blur-md shadow-elevation-4"
-          : "bg-transparent"
+          ? "bg-white/95 backdrop-blur-md shadow-elevation-4"
+          : "bg-white/90 backdrop-blur-sm"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,7 +54,7 @@ export const Navbar = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="px-4 py-2 text-brand-sky hover:text-brand-orange transition-colors duration-300 text-sm font-medium orange-underline"
+                className="px-4 py-2 text-brand-blue hover:text-brand-orange transition-colors duration-300 text-sm font-medium orange-underline"
               >
                 {link.name}
               </a>
@@ -68,7 +68,7 @@ export const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-brand-sky hover:text-brand-orange"
+                  className="text-brand-blue hover:text-brand-orange"
                   onClick={() => navigate("/profile")}
                 >
                   <User className="w-4 h-4 mr-2" />
@@ -77,7 +77,7 @@ export const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-brand-sky hover:text-brand-orange"
+                  className="text-brand-blue hover:text-brand-orange"
                   onClick={handleLogout}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
@@ -88,7 +88,7 @@ export const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-brand-sky hover:text-brand-orange"
+                className="text-brand-blue hover:text-brand-orange"
                 onClick={() => navigate("/auth")}
               >
                 <User className="w-4 h-4 mr-2" />
@@ -105,7 +105,7 @@ export const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden text-brand-orange p-2 hover:bg-brand-orange/10 rounded-lg transition-colors"
+            className="lg:hidden text-brand-blue p-2 hover:bg-brand-blue/10 rounded-lg transition-colors"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -117,13 +117,13 @@ export const Navbar = () => {
             isOpen ? "max-h-[500px] pb-6" : "max-h-0"
           }`}
         >
-          <div className="flex flex-col gap-2 pt-4 border-t border-brand-orange/20">
+          <div className="flex flex-col gap-2 pt-4 border-t border-brand-blue/20">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className="px-4 py-3 text-brand-sky hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all duration-300"
+                className="px-4 py-3 text-brand-blue hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all duration-300"
               >
                 {link.name}
               </a>
@@ -131,17 +131,17 @@ export const Navbar = () => {
             <div className="flex flex-col gap-3 mt-4 px-4">
               {user ? (
                 <>
-                  <Button variant="outline" className="w-full" onClick={() => navigate("/profile")}>
+                  <Button variant="outline" className="w-full text-brand-blue border-brand-blue" onClick={() => navigate("/profile")}>
                     <User className="w-4 h-4 mr-2" />
                     Profile
                   </Button>
-                  <Button variant="ghost" className="w-full" onClick={handleLogout}>
+                  <Button variant="ghost" className="w-full text-brand-blue" onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </Button>
                 </>
               ) : (
-                <Button variant="outline" className="w-full" onClick={() => navigate("/auth")}>
+                <Button variant="outline" className="w-full text-brand-blue border-brand-blue" onClick={() => navigate("/auth")}>
                   <User className="w-4 h-4 mr-2" />
                   Login
                 </Button>
