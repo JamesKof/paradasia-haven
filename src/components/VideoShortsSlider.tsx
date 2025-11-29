@@ -1,44 +1,50 @@
 import { useState } from "react";
 import { Play, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import paradasiaCover from "@/assets/paradasia-cover.jpg";
+import paradasiaAerial1 from "@/assets/paradasia-aerial-1.jpg";
+import paradasiaAerial2 from "@/assets/paradasia-aerial-2.jpg";
+import paradasiaSunset1 from "@/assets/paradasia-sunset-1.jpg";
+import paradasiaSunset2 from "@/assets/paradasia-sunset-2.jpg";
+import paradasiaNight from "@/assets/paradasia-night-1.jpg";
 
-// Updated with actual Paradasia Hideway video content
+// Paradasia Hideway video content with real property images
 const shorts = [
   {
     id: "short1",
     videoId: "DJwGD0CZyrk",
     title: "Paradise Awaits at Paradasia Hideway",
-    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/maxresdefault.jpg",
+    thumbnail: paradasiaCover,
   },
   {
     id: "short2",
     videoId: "DJwGD0CZyrk",
-    title: "Luxury Island Living in Ghana",
-    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/hqdefault.jpg",
+    title: "Aerial Views of Big Ada",
+    thumbnail: paradasiaAerial1,
   },
   {
     id: "short3",
     videoId: "DJwGD0CZyrk",
-    title: "Romantic Sunset Moments",
-    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/sddefault.jpg",
+    title: "Luxury Island Living in Ghana",
+    thumbnail: paradasiaAerial2,
   },
   {
     id: "short4",
     videoId: "DJwGD0CZyrk",
-    title: "Big Ada Aquatic Adventures",
-    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/mqdefault.jpg",
+    title: "Romantic Sunset Moments",
+    thumbnail: paradasiaSunset1,
   },
   {
     id: "short5",
     videoId: "DJwGD0CZyrk",
-    title: "Culture & Cuisine Experience",
-    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/default.jpg",
+    title: "Golden Hour at Paradasia",
+    thumbnail: paradasiaSunset2,
   },
   {
     id: "short6",
     videoId: "DJwGD0CZyrk",
-    title: "Premium Room Tours",
-    thumbnail: "https://img.youtube.com/vi/DJwGD0CZyrk/0.jpg",
+    title: "Night Ambiance",
+    thumbnail: paradasiaNight,
   },
 ];
 

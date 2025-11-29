@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Crown, Users, Bed, Wifi, Wind, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookingModal } from "@/components/BookingModal";
-import presidentialSuite from "@/assets/presidential-suite.jpg";
-import standardRoom from "@/assets/standard-room.jpg";
+import presidentialSuite from "@/assets/paradasia-night-1.jpg";
+import standardRoom from "@/assets/paradasia-pool.jpg";
 
 const rooms = [
   {
