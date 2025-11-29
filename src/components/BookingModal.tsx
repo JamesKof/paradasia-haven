@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Users, CreditCard } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,6 +13,23 @@ interface BookingModalProps {
   roomType: "presidential" | "standard";
   roomName: string;
   pricePerNight: number;
+}
+
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup: (options: {
+        key: string;
+        email: string;
+        amount: number;
+        currency: string;
+        ref: string;
+        metadata?: Record<string, any>;
+        callback: (response: { reference: string }) => void;
+        onClose: () => void;
+      }) => { openIframe: () => void };
+    };
+  }
 }
 
 export const BookingModal = ({
@@ -35,6 +52,25 @@ export const BookingModal = ({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paystackLoaded, setPaystackLoaded] = useState(false);
+
+  // Load Paystack script
+  useEffect(() => {
+    if (window.PaystackPop) {
+      setPaystackLoaded(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://js.paystack.co/v1/inline.js";
+    script.async = true;
+    script.onload = () => setPaystackLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      // Don't remove the script on unmount as it might be needed elsewhere
+    };
+  }, []);
 
   const calculateNights = () => {
     if (!checkIn || !checkOut) return 0;
@@ -47,7 +83,7 @@ export const BookingModal = ({
   const nights = calculateNights();
   const totalAmount = nights * pricePerNight;
 
-  const handlePaystackPayment = async () => {
+  const handlePaystackPopup = async () => {
     if (!user) {
       toast({
         title: "Login Required",
@@ -76,44 +112,103 @@ export const BookingModal = ({
       return;
     }
 
-    setIsProcessing(true);
-
-    try {
-      // Call the edge function to initialize Paystack payment
-      const { data, error } = await supabase.functions.invoke("process-payment", {
-        body: {
-          email,
-          amount: totalAmount,
-          firstName,
-          lastName,
-          phone,
-          roomType,
-          roomPrice: pricePerNight,
-          checkIn,
-          checkOut,
-          guests,
-          specialRequests,
-          userId: user.id,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data.success && data.authorization_url) {
-        // Redirect to Paystack checkout
-        window.location.href = data.authorization_url;
-      } else {
-        throw new Error(data.error || "Payment initialization failed");
-      }
-    } catch (error: any) {
-      console.error("Payment error:", error);
+    if (!paystackLoaded || !window.PaystackPop) {
       toast({
-        title: "Payment Error",
-        description: error.message || "Failed to initialize payment. Please try again.",
+        title: "Payment Loading",
+        description: "Payment system is loading. Please try again.",
         variant: "destructive",
       });
-      setIsProcessing(false);
+      return;
     }
+
+    const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+    if (!paystackKey) {
+      toast({
+        title: "Configuration Error",
+        description: "Payment is not configured. Please use Demo Booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    const paymentRef = `PH-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+    const handler = window.PaystackPop.setup({
+      key: paystackKey,
+      email: email,
+      amount: totalAmount * 100, // Paystack uses pesewas
+      currency: "GHS",
+      ref: paymentRef,
+      metadata: {
+        custom_fields: [
+          { display_name: "Guest Name", variable_name: "guest_name", value: `${firstName} ${lastName}` },
+          { display_name: "Room Type", variable_name: "room_type", value: roomType },
+          { display_name: "Check-in", variable_name: "check_in", value: checkIn },
+          { display_name: "Check-out", variable_name: "check_out", value: checkOut },
+        ],
+      },
+      callback: async (response) => {
+        // Payment successful
+        try {
+          const { data: booking, error } = await supabase.from("bookings").insert({
+            user_id: user.id,
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone || null,
+            room_type: roomType,
+            room_price: pricePerNight,
+            check_in: checkIn,
+            check_out: checkOut,
+            guests,
+            special_requests: specialRequests || null,
+            booking_status: "confirmed",
+            payment_status: "paid",
+            payment_reference: response.reference,
+            total_amount: totalAmount,
+          }).select().single();
+
+          if (error) throw error;
+
+          // Send confirmation email
+          try {
+            await supabase.functions.invoke("send-email", {
+              body: {
+                type: "booking_confirmation",
+                booking,
+              },
+            });
+          } catch (emailError) {
+            console.error("Email error:", emailError);
+          }
+
+          toast({
+            title: "Payment Successful!",
+            description: "Your booking has been confirmed. Check your email for details.",
+          });
+          onClose();
+          navigate("/profile");
+        } catch (error: any) {
+          console.error("Error creating booking:", error);
+          toast({
+            title: "Booking Error",
+            description: "Payment successful but booking failed. Please contact support with reference: " + response.reference,
+            variant: "destructive",
+          });
+        }
+        setIsProcessing(false);
+      },
+      onClose: () => {
+        setIsProcessing(false);
+        toast({
+          title: "Payment Cancelled",
+          description: "You closed the payment window. Your booking was not completed.",
+        });
+      },
+    });
+
+    handler.openIframe();
   };
 
   // Demo booking without payment (for testing)
@@ -345,11 +440,11 @@ export const BookingModal = ({
               variant="orange"
               size="lg"
               className="w-full"
-              onClick={handlePaystackPayment}
+              onClick={handlePaystackPopup}
               disabled={isProcessing || nights <= 0}
             >
               <CreditCard className="w-5 h-5 mr-2" />
-              {isProcessing ? "Processing..." : `Pay with Paystack - GH₵${totalAmount.toLocaleString()}`}
+              {isProcessing ? "Processing..." : `Pay Now - GH₵${totalAmount.toLocaleString()}`}
             </Button>
             
             <Button
@@ -364,7 +459,7 @@ export const BookingModal = ({
           </div>
 
           <p className="text-brand-sky/50 text-xs text-center">
-            By booking, you agree to our terms and conditions
+            Secure payment powered by Paystack
           </p>
         </div>
       </DialogContent>
