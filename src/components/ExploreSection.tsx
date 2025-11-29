@@ -1,7 +1,7 @@
 import { MapPin, Camera, Heart, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import explore1 from "@/assets/explore-1.jpg";
-import explore2 from "@/assets/explore-2.jpg";
+import paradasiaAerial from "@/assets/paradasia-aerial-1.jpg";
+import paradasiaView from "@/assets/paradasia-view.jpg";
 
 const experiences = [
   {
@@ -52,15 +52,15 @@ export const ExploreSection = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="relative rounded-2xl overflow-hidden shadow-elevation-4 h-[350px]">
                 <img
-                  src={explore1}
-                  alt="Romantic sunset cruise"
+                  src={paradasiaAerial}
+                  alt="Paradasia Hideway aerial view of Big Ada"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
               <div className="relative rounded-2xl overflow-hidden shadow-elevation-4 h-[350px] mt-8">
                 <img
-                  src={explore2}
-                  alt="Beautiful beach at sunrise"
+                  src={paradasiaView}
+                  alt="Paradasia Hideway property view"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
