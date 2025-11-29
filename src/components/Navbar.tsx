@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/hooks/useAdmin";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -18,6 +19,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,6 +77,17 @@ export const Navbar = () => {
           <div className="hidden lg:flex items-center gap-4">
             {user ? (
               <>
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-brand-orange hover:text-brand-orange-dark"
+                    onClick={() => navigate("/admin")}
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
@@ -154,6 +167,12 @@ export const Navbar = () => {
             <div className="flex flex-col gap-3 mt-4 px-4">
               {user ? (
                 <>
+                  {isAdmin && (
+                    <Button variant="outline" className="w-full text-brand-orange border-brand-orange" onClick={() => navigate("/admin")}>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Admin Dashboard
+                    </Button>
+                  )}
                   <Button variant="outline" className="w-full text-brand-blue border-brand-blue" onClick={() => navigate("/profile")}>
                     <User className="w-4 h-4 mr-2" />
                     Profile
