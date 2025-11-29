@@ -9,7 +9,7 @@ const navLinks = [
   { name: "Home", href: "#home" },
   { name: "About", href: "#about" },
   { name: "Accommodation", href: "#accommodation" },
-  { name: "Amenities", href: "#amenities" },
+  { name: "Gallery", href: "/gallery", isRoute: true },
   { name: "Explore", href: "#explore" },
   { name: "Contact", href: "#contact" },
 ];
@@ -50,15 +50,25 @@ export const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-4 py-2 text-brand-blue hover:text-brand-orange transition-colors duration-300 text-sm font-medium orange-underline"
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.isRoute ? (
+                <span
+                  key={link.name}
+                  onClick={() => navigate(link.href)}
+                  className="px-4 py-2 text-brand-blue hover:text-brand-orange transition-colors duration-300 text-sm font-medium orange-underline cursor-pointer"
+                >
+                  {link.name}
+                </span>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="px-4 py-2 text-brand-blue hover:text-brand-orange transition-colors duration-300 text-sm font-medium orange-underline"
+                >
+                  {link.name}
+                </a>
+              )
+            )}
           </div>
 
           {/* Desktop CTA */}
@@ -118,16 +128,29 @@ export const Navbar = () => {
           }`}
         >
           <div className="flex flex-col gap-2 pt-4 border-t border-brand-blue/20">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-3 text-brand-blue hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all duration-300"
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.isRoute ? (
+                <span
+                  key={link.name}
+                  onClick={() => {
+                    navigate(link.href);
+                    setIsOpen(false);
+                  }}
+                  className="px-4 py-3 text-brand-blue hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all duration-300 cursor-pointer"
+                >
+                  {link.name}
+                </span>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-3 text-brand-blue hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all duration-300"
+                >
+                  {link.name}
+                </a>
+              )
+            )}
             <div className="flex flex-col gap-3 mt-4 px-4">
               {user ? (
                 <>
