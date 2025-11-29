@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { bookingFormSchema, type BookingFormData } from "@/lib/validations";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -43,14 +44,17 @@ export const BookingModal = ({
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(2);
-  const [specialRequests, setSpecialRequests] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [formData, setFormData] = useState<BookingFormData>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    checkIn: "",
+    checkOut: "",
+    guests: 2,
+    specialRequests: "",
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof BookingFormData, string>>>({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [paystackLoaded, setPaystackLoaded] = useState(false);
 
@@ -66,22 +70,44 @@ export const BookingModal = ({
     script.async = true;
     script.onload = () => setPaystackLoaded(true);
     document.body.appendChild(script);
-
-    return () => {
-      // Don't remove the script on unmount as it might be needed elsewhere
-    };
   }, []);
 
   const calculateNights = () => {
-    if (!checkIn || !checkOut) return 0;
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
+    if (!formData.checkIn || !formData.checkOut) return 0;
+    const start = new Date(formData.checkIn);
+    const end = new Date(formData.checkOut);
     const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     return diff > 0 ? diff : 0;
   };
 
   const nights = calculateNights();
   const totalAmount = nights * pricePerNight;
+
+  const handleChange = (field: keyof BookingFormData, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const result = bookingFormSchema.safeParse(formData);
+    
+    if (!result.success) {
+      const newErrors: Partial<Record<keyof BookingFormData, string>> = {};
+      result.error.errors.forEach(err => {
+        const field = err.path[0] as keyof BookingFormData;
+        if (!newErrors[field]) {
+          newErrors[field] = err.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
+    }
+    
+    setErrors({});
+    return true;
+  };
 
   const handlePaystackPopup = async () => {
     if (!user) {
@@ -94,19 +120,19 @@ export const BookingModal = ({
       return;
     }
 
-    if (!checkIn || !checkOut || nights <= 0) {
+    if (!validateForm()) {
       toast({
-        title: "Invalid Dates",
-        description: "Please select valid check-in and check-out dates.",
+        title: "Validation Error",
+        description: "Please fix the errors in the form.",
         variant: "destructive",
       });
       return;
     }
 
-    if (!firstName || !lastName || !email) {
+    if (nights <= 0) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Invalid Dates",
+        description: "Please select valid check-in and check-out dates.",
         variant: "destructive",
       });
       return;
@@ -136,33 +162,32 @@ export const BookingModal = ({
 
     const handler = window.PaystackPop.setup({
       key: paystackKey,
-      email: email,
-      amount: totalAmount * 100, // Paystack uses pesewas
+      email: formData.email,
+      amount: totalAmount * 100,
       currency: "GHS",
       ref: paymentRef,
       metadata: {
         custom_fields: [
-          { display_name: "Guest Name", variable_name: "guest_name", value: `${firstName} ${lastName}` },
+          { display_name: "Guest Name", variable_name: "guest_name", value: `${formData.firstName} ${formData.lastName}` },
           { display_name: "Room Type", variable_name: "room_type", value: roomType },
-          { display_name: "Check-in", variable_name: "check_in", value: checkIn },
-          { display_name: "Check-out", variable_name: "check_out", value: checkOut },
+          { display_name: "Check-in", variable_name: "check_in", value: formData.checkIn },
+          { display_name: "Check-out", variable_name: "check_out", value: formData.checkOut },
         ],
       },
       callback: async (response) => {
-        // Payment successful
         try {
           const { data: booking, error } = await supabase.from("bookings").insert({
             user_id: user.id,
-            email,
-            first_name: firstName,
-            last_name: lastName,
-            phone: phone || null,
+            email: formData.email,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone || null,
             room_type: roomType,
             room_price: pricePerNight,
-            check_in: checkIn,
-            check_out: checkOut,
-            guests,
-            special_requests: specialRequests || null,
+            check_in: formData.checkIn,
+            check_out: formData.checkOut,
+            guests: formData.guests,
+            special_requests: formData.specialRequests || null,
             booking_status: "confirmed",
             payment_status: "paid",
             payment_reference: response.reference,
@@ -171,13 +196,9 @@ export const BookingModal = ({
 
           if (error) throw error;
 
-          // Send confirmation email
           try {
             await supabase.functions.invoke("send-email", {
-              body: {
-                type: "booking_confirmation",
-                booking,
-              },
+              body: { type: "booking_confirmation", booking },
             });
           } catch (emailError) {
             console.error("Email error:", emailError);
@@ -211,7 +232,6 @@ export const BookingModal = ({
     handler.openIframe();
   };
 
-  // Demo booking without payment (for testing)
   const handleDemoBooking = async () => {
     if (!user) {
       toast({
@@ -223,19 +243,19 @@ export const BookingModal = ({
       return;
     }
 
-    if (!checkIn || !checkOut || nights <= 0) {
+    if (!validateForm()) {
       toast({
-        title: "Invalid Dates",
-        description: "Please select valid check-in and check-out dates.",
+        title: "Validation Error",
+        description: "Please fix the errors in the form.",
         variant: "destructive",
       });
       return;
     }
 
-    if (!firstName || !lastName || !email) {
+    if (nights <= 0) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Invalid Dates",
+        description: "Please select valid check-in and check-out dates.",
         variant: "destructive",
       });
       return;
@@ -248,16 +268,16 @@ export const BookingModal = ({
       
       const { data: booking, error } = await supabase.from("bookings").insert({
         user_id: user.id,
-        email,
-        first_name: firstName,
-        last_name: lastName,
-        phone: phone || null,
+        email: formData.email,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone: formData.phone || null,
         room_type: roomType,
         room_price: pricePerNight,
-        check_in: checkIn,
-        check_out: checkOut,
-        guests,
-        special_requests: specialRequests || null,
+        check_in: formData.checkIn,
+        check_out: formData.checkOut,
+        guests: formData.guests,
+        special_requests: formData.specialRequests || null,
         booking_status: "confirmed",
         payment_status: "paid",
         payment_reference: paymentRef,
@@ -266,13 +286,9 @@ export const BookingModal = ({
 
       if (error) throw error;
 
-      // Send confirmation email
       try {
         await supabase.functions.invoke("send-email", {
-          body: {
-            type: "booking_confirmation",
-            booking,
-          },
+          body: { type: "booking_confirmation", booking },
         });
       } catch (emailError) {
         console.error("Email error:", emailError);
@@ -329,28 +345,34 @@ export const BookingModal = ({
             <div>
               <label className="block text-brand-sky text-sm mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
-                Check-in
+                Check-in *
               </label>
               <input
                 type="date"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
+                value={formData.checkIn}
+                onChange={(e) => handleChange("checkIn", e.target.value)}
                 min={today}
-                className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
+                className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light focus:outline-none ${
+                  errors.checkIn ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+                }`}
               />
+              {errors.checkIn && <p className="text-red-400 text-xs mt-1">{errors.checkIn}</p>}
             </div>
             <div>
               <label className="block text-brand-sky text-sm mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
-                Check-out
+                Check-out *
               </label>
               <input
                 type="date"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-                min={checkIn || today}
-                className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
+                value={formData.checkOut}
+                onChange={(e) => handleChange("checkOut", e.target.value)}
+                min={formData.checkIn || today}
+                className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light focus:outline-none ${
+                  errors.checkOut ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+                }`}
               />
+              {errors.checkOut && <p className="text-red-400 text-xs mt-1">{errors.checkOut}</p>}
             </div>
           </div>
 
@@ -361,8 +383,8 @@ export const BookingModal = ({
               Number of Guests
             </label>
             <select
-              value={guests}
-              onChange={(e) => setGuests(Number(e.target.value))}
+              value={formData.guests}
+              onChange={(e) => handleChange("guests", Number(e.target.value))}
               className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
             >
               {[1, 2, 3, 4].map((n) => (
@@ -379,23 +401,27 @@ export const BookingModal = ({
               <label className="block text-brand-sky text-sm mb-2">First Name *</label>
               <input
                 type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
+                value={formData.firstName}
+                onChange={(e) => handleChange("firstName", e.target.value)}
+                className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light focus:outline-none ${
+                  errors.firstName ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+                }`}
                 placeholder="John"
-                required
               />
+              {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>}
             </div>
             <div>
               <label className="block text-brand-sky text-sm mb-2">Last Name *</label>
               <input
                 type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
+                value={formData.lastName}
+                onChange={(e) => handleChange("lastName", e.target.value)}
+                className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light focus:outline-none ${
+                  errors.lastName ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+                }`}
                 placeholder="Doe"
-                required
               />
+              {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>}
             </div>
           </div>
 
@@ -403,35 +429,43 @@ export const BookingModal = ({
             <label className="block text-brand-sky text-sm mb-2">Email *</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light focus:outline-none ${
+                errors.email ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+              }`}
               placeholder="you@example.com"
-              required
             />
+            {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
           </div>
 
           <div>
             <label className="block text-brand-sky text-sm mb-2">Phone</label>
             <input
               type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light focus:outline-none focus:border-brand-orange"
+              value={formData.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light focus:outline-none ${
+                errors.phone ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+              }`}
               placeholder="+233 XX XXX XXXX"
             />
+            {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
           </div>
 
           {/* Special Requests */}
           <div>
             <label className="block text-brand-sky text-sm mb-2">Special Requests</label>
             <textarea
-              value={specialRequests}
-              onChange={(e) => setSpecialRequests(e.target.value)}
+              value={formData.specialRequests}
+              onChange={(e) => handleChange("specialRequests", e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange resize-none"
+              className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none resize-none ${
+                errors.specialRequests ? "border-red-500" : "border-brand-blue focus:border-brand-orange"
+              }`}
               placeholder="Any special requirements..."
             />
+            {errors.specialRequests && <p className="text-red-400 text-xs mt-1">{errors.specialRequests}</p>}
           </div>
 
           {/* Payment Buttons */}

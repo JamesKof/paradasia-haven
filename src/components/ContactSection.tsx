@@ -3,6 +3,7 @@ import { MapPin, Phone, Mail, Instagram, Facebook, Twitter, Loader2 } from "luci
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { contactFormSchema, type ContactFormData } from "@/lib/validations";
 
 const contactInfo = [
   {
@@ -33,7 +34,7 @@ const socialLinks = [
 
 export const ContactSection = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     firstName: "",
     lastName: "",
     email: "",
@@ -41,15 +42,55 @@ export const ContactSection = () => {
     subject: "",
     message: "",
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateField = (field: keyof ContactFormData, value: string) => {
+    const partialData = { ...formData, [field]: value };
+    const result = contactFormSchema.safeParse(partialData);
+    
+    if (!result.success) {
+      const fieldError = result.error.errors.find(e => e.path[0] === field);
+      if (fieldError) {
+        setErrors(prev => ({ ...prev, [field]: fieldError.message }));
+      } else {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+      }
+    } else {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleChange = (field: keyof ContactFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error on change
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleBlur = (field: keyof ContactFormData) => {
+    validateField(field, formData[field] || "");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.firstName || !formData.email || !formData.message) {
+    // Validate all fields
+    const result = contactFormSchema.safeParse(formData);
+    
+    if (!result.success) {
+      const newErrors: Partial<Record<keyof ContactFormData, string>> = {};
+      result.error.errors.forEach(err => {
+        const field = err.path[0] as keyof ContactFormData;
+        if (!newErrors[field]) {
+          newErrors[field] = err.message;
+        }
+      });
+      setErrors(newErrors);
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Validation Error",
+        description: "Please fix the errors in the form.",
         variant: "destructive",
       });
       return;
@@ -58,13 +99,15 @@ export const ContactSection = () => {
     setIsSubmitting(true);
 
     try {
+      const validatedData = result.data;
+      
       // Save inquiry to database
       const { error } = await supabase.from("guest_inquiries").insert({
-        name: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email,
-        phone: formData.phone || null,
-        subject: formData.subject || "General Inquiry",
-        message: formData.message,
+        name: `${validatedData.firstName} ${validatedData.lastName || ""}`.trim(),
+        email: validatedData.email,
+        phone: validatedData.phone || null,
+        subject: validatedData.subject || "General Inquiry",
+        message: validatedData.message,
       });
 
       if (error) throw error;
@@ -75,10 +118,10 @@ export const ContactSection = () => {
           body: {
             type: "inquiry_received",
             inquiry: {
-              name: `${formData.firstName} ${formData.lastName}`.trim(),
-              email: formData.email,
-              subject: formData.subject || "General Inquiry",
-              message: formData.message,
+              name: `${validatedData.firstName} ${validatedData.lastName || ""}`.trim(),
+              email: validatedData.email,
+              subject: validatedData.subject || "General Inquiry",
+              message: validatedData.message,
             },
           },
         });
@@ -100,6 +143,7 @@ export const ContactSection = () => {
         subject: "",
         message: "",
       });
+      setErrors({});
     } catch (error: any) {
       console.error("Error submitting inquiry:", error);
       toast({
@@ -142,21 +186,36 @@ export const ContactSection = () => {
                   <input
                     type="text"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                    onBlur={() => handleBlur("firstName")}
+                    className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none transition-all duration-300 ${
+                      errors.firstName 
+                        ? "border-red-500 focus:border-red-500" 
+                        : "border-brand-blue focus:border-brand-orange focus:ring-1 focus:ring-brand-orange"
+                    }`}
                     placeholder="John"
-                    required
                   />
+                  {errors.firstName && (
+                    <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-brand-sky text-sm mb-2">Last Name</label>
                   <input
                     type="text"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    onBlur={() => handleBlur("lastName")}
+                    className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none transition-all duration-300 ${
+                      errors.lastName 
+                        ? "border-red-500 focus:border-red-500" 
+                        : "border-brand-blue focus:border-brand-orange focus:ring-1 focus:ring-brand-orange"
+                    }`}
                     placeholder="Doe"
                   />
+                  {errors.lastName && (
+                    <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>
+                  )}
                 </div>
               </div>
               
@@ -165,11 +224,18 @@ export const ContactSection = () => {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  onBlur={() => handleBlur("email")}
+                  className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none transition-all duration-300 ${
+                    errors.email 
+                      ? "border-red-500 focus:border-red-500" 
+                      : "border-brand-blue focus:border-brand-orange focus:ring-1 focus:ring-brand-orange"
+                  }`}
                   placeholder="john@example.com"
-                  required
                 />
+                {errors.email && (
+                  <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+                )}
               </div>
               
               <div>
@@ -177,10 +243,18 @@ export const ContactSection = () => {
                 <input
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
+                  onChange={(e) => handleChange("phone", e.target.value)}
+                  onBlur={() => handleBlur("phone")}
+                  className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none transition-all duration-300 ${
+                    errors.phone 
+                      ? "border-red-500 focus:border-red-500" 
+                      : "border-brand-blue focus:border-brand-orange focus:ring-1 focus:ring-brand-orange"
+                  }`}
                   placeholder="+233 XX XXX XXXX"
                 />
+                {errors.phone && (
+                  <p className="text-red-400 text-xs mt-1">{errors.phone}</p>
+                )}
               </div>
 
               <div>
@@ -188,10 +262,18 @@ export const ContactSection = () => {
                 <input
                   type="text"
                   value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300"
+                  onChange={(e) => handleChange("subject", e.target.value)}
+                  onBlur={() => handleBlur("subject")}
+                  className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none transition-all duration-300 ${
+                    errors.subject 
+                      ? "border-red-500 focus:border-red-500" 
+                      : "border-brand-blue focus:border-brand-orange focus:ring-1 focus:ring-brand-orange"
+                  }`}
                   placeholder="Booking inquiry, Special request, etc."
                 />
+                {errors.subject && (
+                  <p className="text-red-400 text-xs mt-1">{errors.subject}</p>
+                )}
               </div>
               
               <div>
@@ -199,11 +281,18 @@ export const ContactSection = () => {
                 <textarea
                   rows={4}
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 bg-brand-blue-dark border border-brand-blue rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all duration-300 resize-none"
-                  placeholder="Tell us about your dream getaway..."
-                  required
+                  onChange={(e) => handleChange("message", e.target.value)}
+                  onBlur={() => handleBlur("message")}
+                  className={`w-full px-4 py-3 bg-brand-blue-dark border rounded-lg text-brand-sky-light placeholder:text-brand-sky/50 focus:outline-none transition-all duration-300 resize-none ${
+                    errors.message 
+                      ? "border-red-500 focus:border-red-500" 
+                      : "border-brand-blue focus:border-brand-orange focus:ring-1 focus:ring-brand-orange"
+                  }`}
+                  placeholder="Tell us about your dream getaway... (minimum 10 characters)"
                 />
+                {errors.message && (
+                  <p className="text-red-400 text-xs mt-1">{errors.message}</p>
+                )}
               </div>
               
               <Button 
